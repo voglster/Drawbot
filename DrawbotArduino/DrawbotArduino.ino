@@ -1,11 +1,3 @@
-// Bounce.pde
-// -*- mode: C++ -*-
-//
-// Make a single stepper bounce from one limit to another
-//
-// Copyright (C) 2012 Mike McCauley
-// $Id: Random.pde,v 1.1 2011/01/05 01:51:01 mikem Exp mikem $
-
 #include <AccelStepper.h>
 #include <MultiStepper.h>
 
@@ -209,13 +201,13 @@ void parseCommand(String &command){
 }
 
 void parseMCommand(String &com){
-  if(com.charAt(1) == '1' and com.charAt(2) == '7'){
+  if(com.charAt(1) == '1' && com.charAt(2) == '7'){
     enableSteppers();
     Serial.println("Ok");
-  }else if(com.charAt(1) == '1' and com.charAt(2) == '8') {
+  }else if(com.charAt(1) == '1' && com.charAt(2) == '8') {
     disableSteppers();
     Serial.println("Ok");
-  }else if(com.charAt(1) == '1' and com.charAt(2) == '1' and com.charAt(3) == '4') {
+  }else if(com.charAt(1) == '1' && com.charAt(2) == '1' && com.charAt(3) == '4') {
     Serial.print("X");
     Serial.print(last_x);
     Serial.print("Y");
@@ -229,7 +221,7 @@ void parseMCommand(String &com){
 }
 
 void parseGCommand(String &com){
-  if(com.charAt(1) == '1' or com.charAt(1) == '0'){
+  if(com.charAt(1) == '1' || com.charAt(1) == '0'){
     float tgt_x = -9999;
     float tgt_y = -9999;
     float tgt_f = -9999;
@@ -239,7 +231,7 @@ void parseGCommand(String &com){
     int fidx = com.indexOf('F');
     if(xidx != -1){
       //we have a x index
-      if(yidx == -1 and fidx == -1){
+      if(yidx == -1 && fidx == -1){
         //only x just read it in
         tgt_x = com.substring(xidx+1).toFloat();
       }else{
@@ -268,27 +260,27 @@ void parseGCommand(String &com){
         }else{
           //all defined lets get order
           //{f,y,x}
-          if(xidx < yidx and yidx < fidx){
+          if(xidx < yidx && yidx < fidx){
             //order x,y,f
             tgt_x = com.substring(xidx+1,yidx).toFloat();
             tgt_y = com.substring(yidx+1,fidx).toFloat();
             tgt_f = com.substring(fidx+1).toFloat();
-          }else if(yidx < xidx and xidx < fidx){
+          }else if(yidx < xidx && xidx < fidx){
             //order y,x,f
             tgt_y = com.substring(yidx+1,xidx).toFloat();
             tgt_x = com.substring(xidx+1,fidx).toFloat();
             tgt_f = com.substring(fidx+1).toFloat();
-          }else if(yidx < fidx and fidx < xidx){
+          }else if(yidx < fidx && fidx < xidx){
             //order y,f,x
             tgt_y = com.substring(yidx+1,fidx).toFloat();
             tgt_f = com.substring(fidx+1,xidx).toFloat();
             tgt_x = com.substring(xidx+1).toFloat();
-          }else if(xidx < fidx and fidx < yidx){
+          }else if(xidx < fidx && fidx < yidx){
             //order x,f,y
             tgt_x = com.substring(xidx+1,fidx).toFloat();
             tgt_f = com.substring(fidx+1,yidx).toFloat();
             tgt_y = com.substring(yidx+1).toFloat();
-          }else if(fidx < xidx and xidx < yidx){
+          }else if(fidx < xidx && xidx < yidx){
             //order f,x,y
             tgt_f = com.substring(fidx+1,xidx).toFloat();
             tgt_x = com.substring(xidx+1,yidx).toFloat();
@@ -332,7 +324,7 @@ void parseGCommand(String &com){
     gotoXY(tgt_x,tgt_y);
     
   }else{
-    if(com.charAt(1) == '9' and com.charAt(2) == '2'){
+    if(com.charAt(1) == '9' && com.charAt(2) == '2'){
       warp(0,0);
       Serial.println(F("Ok")); 
     }
