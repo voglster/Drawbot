@@ -39,7 +39,7 @@ hole_rad = cd_hole_rad;
 base_height = 3;
 shaft_thickness=3;
 shaft_height = 30;
-grub_hole_size = 3;
+grub_hole_size = 1.6;
 
 module tear(small_rad,large_rad,hole_rad,base_height,center=false){
 
