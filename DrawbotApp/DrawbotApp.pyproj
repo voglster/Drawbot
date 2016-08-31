@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>760dcc21-c328-4fd2-ac4c-c18dc7aa10b7</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>play.py</StartupFile>
+    <StartupFile>console_app.py</StartupFile>
     <SearchPath>.</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
