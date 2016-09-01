@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>760dcc21-c328-4fd2-ac4c-c18dc7aa10b7</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>console_app.py</StartupFile>
+    <StartupFile>windows_app.py</StartupFile>
     <SearchPath>.</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -21,13 +21,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dxfgeom.py" />
     <Compile Include="lib\DrawBot.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="console_app.py" />
     <Compile Include="lib\__init__.py" />
-    <Compile Include="play.py" />
-    <Compile Include="ui.py">
+    <Compile Include="windows_app.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

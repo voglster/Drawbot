@@ -1,6 +1,6 @@
 from PIL import Image,ImageEnhance
 import numpy as np
-from lib.DrawBot import DrawBot
+from lib.DrawBot import DrawBotLowLevel
 
 
 class DBImageConverter():
@@ -27,12 +27,8 @@ class DBImageConverter():
     def pixels(self):
         reverse = False
         for y,row in enumerate(self.as_array()):
-            if reverse:
-                for x,pixel in reversed([q for q in enumerate(row)]):
-                    yield (x-(self.thumbsize/2),y,pixel,reverse)
-            else:
-                for x,pixel in enumerate(row):
-                    yield (x-(self.thumbsize/2),y,pixel,reverse)
+            for x,pixel in (reversed([q for q in enumerate(row)]) if reverse else enumerate(row)):
+                yield (x-(self.thumbsize/2),y,pixel,reverse)
             reverse = not reverse
 
     def show(self):
@@ -41,18 +37,17 @@ class DBImageConverter():
 dbic = DBImageConverter(r"C:\Users\jimmv\Desktop\apple_man.bmp")
 dbic.show()
 #input("Waiting ctrl-c to abort")
-drawbot = DrawBot("COM9")
+drawbot = DrawBotLowLevel("COM9")
 
-pixel_size = 1.0 * drawbot.canvas_size/dbic.thumbsize
+canvas_size = 200
+pixel_size = 1.0 * canvas_size/dbic.thumbsize
 vert_line_size = pixel_size * 0.9
 vert_offset = (pixel_size - vert_line_size)/2.0
 
-def gcode(data,shades=8.0):
+def gcode(data,shades=10.0):
+    shades -= 1
     x,y,pixel,reverse = data
     pixel = 255-pixel #invert the color 255 is now black and 0 is white
-    #255/x = shades
-    #1/x = shades/255
-    #x = 255/shades
 
     pixel = int(pixel*(shades/255.0))
 
@@ -72,13 +67,12 @@ def gcode(data,shades=8.0):
             yield "G0X" + str(round(x+(idx*increment),4)) + "Y" + str(round(y+vert_offset+vert_line_size,4)),"lineend"
 
 def gcode_lines(pixels):
-    for i in dbic.pixels:
+    for i in pixels:
         for g,type in gcode(i):
             yield g,type
 
 def penup_down_lines(pixels):
     penstate = "UP"
-    cur = None
     yield "M5" #pen up
     for g,type in gcode_lines(pixels):
         if type != "BLANK":
@@ -90,7 +84,6 @@ def penup_down_lines(pixels):
             if penstate != "UP":
                 yield "M5"
                 penstate = "UP"
-    yield cur
 
 from tqdm import tqdm
 
