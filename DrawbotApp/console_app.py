@@ -10,9 +10,18 @@ class DBImageConverter():
         self.raw_image.thumbnail((self.thumbsize,self.thumbsize))
         enhancer = ImageEnhance.Contrast(self.raw_image)
         self.raw_image = enhancer.enhance(2)
+        self.shader()
 
     def as_array(self):
         return np.asarray(self.raw_image.getdata(),dtype=np.float64).reshape((self.raw_image.size[1],self.raw_image.size[0]))
+
+    def shader(self,shades=10):
+        shades -= 1
+        ary = self.as_array()
+        for x,row in enumerate(ary):
+            for y,pixel in enumerate(row):
+                ary[x,y] = int(int(pixel*(shades/255.0)) * (255.0/shades))
+        self.raw_image = Image.fromarray(np.uint8(ary))
     
     @property
     def pixels(self):
@@ -31,6 +40,7 @@ class DBImageConverter():
 
 dbic = DBImageConverter(r"C:\Users\jimmv\Desktop\apple_man.bmp")
 dbic.show()
+#input("Waiting ctrl-c to abort")
 drawbot = DrawBot("COM9")
 
 pixel_size = 1.0 * drawbot.canvas_size/dbic.thumbsize
@@ -49,7 +59,7 @@ def gcode(data,shades=8.0):
     x = x * pixel_size
     y = y * pixel_size
     if not pixel:
-        yield "G0X" + str(round(x+pixel_size,4)) + "Y" + str(round(y+pixel_size/2,4))
+        yield "G0X" + str(round(x+pixel_size,4)) + "Y" + str(round(y+pixel_size/2,4)),"BLANK"
     else:
         increment = pixel_size/pixel
 
@@ -58,24 +68,40 @@ def gcode(data,shades=8.0):
             lst = reversed(lst)
 
         for idx in lst:
-            yield "G0X" + str(round(x+(idx*increment),4)) + "Y" + str(round(y+vert_offset,4))
-            yield "G0X" + str(round(x+(idx*increment),4)) + "Y" + str(round(y+vert_offset+vert_line_size,4))
+            yield "G0X" + str(round(x+(idx*increment),4)) + "Y" + str(round(y+vert_offset,4)),"linestart"
+            yield "G0X" + str(round(x+(idx*increment),4)) + "Y" + str(round(y+vert_offset+vert_line_size,4)),"lineend"
 
 def gcode_lines(pixels):
     for i in dbic.pixels:
-        for g in gcode(i):
+        for g,type in gcode(i):
+            yield g,type
+
+def penup_down_lines(pixels):
+    penstate = "UP"
+    cur = None
+    yield "M5" #pen up
+    for g,type in gcode_lines(pixels):
+        if type != "BLANK":
             yield g
+            if penstate == "UP":
+                penstate = "DOWN"
+                yield "M3"
+        else:
+            if penstate != "UP":
+                yield "M5"
+                penstate = "UP"
+    yield cur
 
 from tqdm import tqdm
 
-gcode_count = sum([1 for i in gcode_lines(dbic.pixels)])
+gcode_count = sum([1 for i in penup_down_lines(dbic.pixels)])
 print(gcode_count)
 input("Waiting ctrl-c to abort")
 
 drawbot.sendGCode("M17",True)
 drawbot.sendGCode("G0F25",True)
 
-[drawbot.sendGCode(g,True) for g in tqdm(iterable=gcode_lines(dbic.pixels),total=gcode_count)]
+[drawbot.sendGCode(g,True) for g in tqdm(iterable=penup_down_lines(dbic.pixels),total=gcode_count)]
 
 drawbot.sendGCode("M18",True)
 drawBot.shutdown()
