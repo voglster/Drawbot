@@ -27,6 +27,9 @@
     </Compile>
     <Compile Include="console_app.py" />
     <Compile Include="lib\__init__.py" />
+    <Compile Include="SVGScale.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="windows_app.py">
       <SubType>Code</SubType>
     </Compile>
